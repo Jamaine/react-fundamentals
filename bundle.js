@@ -5,8 +5,6 @@ var React = require('react');
 var ReactDom = require('react-dom');
 var App = require('./modules/app.js');
 
-ReactDom.render(React.createElement(App, null), document.querySelector('.react'));
-
 },{"./modules/app.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
 
@@ -19,6 +17,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var ReactDom = require('react-dom');
 
 // Stateful component - it can have state
 
@@ -34,20 +33,41 @@ var App = function (_React$Component) {
   _createClass(App, [{
     key: 'render',
     value: function render() {
+      var txt = this.props.txt;
       return React.createElement(
         'h1',
         null,
-        'hello world!!!'
+        'hello world!!!',
+        React.createElement(
+          'span',
+          null,
+          txt
+        )
       );
     }
   }]);
 
   return App;
 }(React.Component);
+// setting propTypes
 
-module.exports = App;
+App.propTypes = {
+  txt: React.PropTypes.string,
+  // isRequired means the prop is required on the component
+  cat: React.PropTypes.number.isRequired
+};
 
-},{"react":160}],3:[function(require,module,exports){
+// setting default props
+//  if no prop or prop value has been supplied the default will be applied
+App.defaultProps = {
+  txt: 'this is the default text'
+};
+
+ReactDom.render(
+// cat isRequired as set in the propTypes object and needs to be a number
+React.createElement(App, { cat: 5, txt: 'this is the props value' }), document.querySelector('.react'));
+
+},{"react":160,"react-dom":4}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
