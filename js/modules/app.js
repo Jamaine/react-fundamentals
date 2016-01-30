@@ -3,12 +3,27 @@ const ReactDom = require('react-dom')
 
 // Stateful component - it can have state
 class App extends React.Component {
+  constructor () {
+    super();
+    this.state = {
+      msg:'this is the state text'
+    }
+  }
+  update (e) {
+    this.setState({msg: e.target.value})
+  }
   render () {
     let txt = this.props.txt;
+    let msg = this.state.msg;
     return (
-      <h1>hello world!!!
-        <span>{txt}</span>
-      </h1>
+      <div>
+        <h1>hello world!!!</h1>
+        <input
+          onChange={this.update.bind(this)} 
+          type="text"/>
+        <span>{txt}, {msg}</span>
+      </div>
+
     )
   }
 }
