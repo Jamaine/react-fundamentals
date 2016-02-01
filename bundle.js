@@ -20,6 +20,7 @@ var React = require('react');
 var ReactDom = require('react-dom');
 
 // Stateful component - it can have state
+// Owner component
 
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
@@ -47,12 +48,20 @@ var App = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      return React.createElement(Widget, { update: this.update, txt: this.state.txt });
+      return React.createElement(
+        'div',
+        null,
+        React.createElement(Widget, { update: this.update, txt: this.state.txt }),
+        React.createElement(Widget, { update: this.update, txt: this.state.txt }),
+        React.createElement(Widget, { update: this.update, txt: this.state.txt })
+      );
     }
   }]);
 
   return App;
 }(React.Component);
+
+// Ownee component - it is rendered within an owner component
 
 var Widget = function Widget(props) {
   return React.createElement(

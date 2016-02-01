@@ -2,6 +2,7 @@ const React = require('react');
 const ReactDom = require('react-dom')
 
 // Stateful component - it can have state
+// Owner component
 class App extends React.Component {
   constructor () {
     super();
@@ -18,11 +19,16 @@ class App extends React.Component {
   }
   render () {
     return (
-      <Widget update={this.update} txt={this.state.txt} />
+      <div>
+        <Widget update={this.update} txt={this.state.txt} />
+        <Widget update={this.update} txt={this.state.txt} />
+        <Widget update={this.update} txt={this.state.txt} />
+      </div>
     )
   }
 }
 
+// Ownee component - it is rendered within an owner component
 const Widget = (props) => {
   return (
     <div>
