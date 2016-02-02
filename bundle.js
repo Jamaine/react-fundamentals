@@ -3,9 +3,9 @@
 
 var React = require('react');
 var ReactDom = require('react-dom');
-var App = require('./modules/owner-ownee.js');
+var App = require('./modules/using-refs-to-access-components.js');
 
-},{"./modules/owner-ownee.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
+},{"./modules/using-refs-to-access-components.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -19,9 +19,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var ReactDom = require('react-dom');
 
-// Stateful component - it can have state
-// Owner component
-
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
 
@@ -31,11 +28,10 @@ var App = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
 
     _this.state = {
-      txt: 'this is the state text'
+      red: 0,
+      green: 0,
+      blue: 0
     };
-    // Used here instead of in the onChange handler as a bind call
-    // in the render path creates a brand new function on every single render
-    // https://github.com/airbnb/javascript/tree/master/react
     _this.update = _this.update.bind(_this);
     return _this;
   }
@@ -43,7 +39,14 @@ var App = function (_React$Component) {
   _createClass(App, [{
     key: 'update',
     value: function update(e) {
-      this.setState({ txt: e.target.value });
+      this.setState({
+        // red:ReactDom.findDOMNode(this.refs.red).value,
+        // the above line will work if the child component returned a single node
+        red: ReactDom.findDOMNode(this.refs.red.refs.input).value,
+        green: ReactDom.findDOMNode(this.refs.green.refs.input).value,
+        blue: ReactDom.findDOMNode(this.refs.blue.refs.input).value
+      });
+      console.log(ReactDom.findDOMNode(this.refs.blue).value);
     }
   }, {
     key: 'render',
@@ -51,31 +54,58 @@ var App = function (_React$Component) {
       return React.createElement(
         'div',
         null,
-        React.createElement(Widget, { update: this.update, txt: this.state.txt }),
-        React.createElement(Widget, { update: this.update, txt: this.state.txt }),
-        React.createElement(Widget, { update: this.update, txt: this.state.txt })
+        React.createElement(Slider, { ref: 'red', update: this.update }),
+        React.createElement(
+          'p',
+          null,
+          this.state.red
+        ),
+        React.createElement(Slider, { ref: 'green', update: this.update }),
+        React.createElement(
+          'p',
+          null,
+          this.state.green
+        ),
+        React.createElement(Slider, { ref: 'blue', update: this.update }),
+        React.createElement(
+          'p',
+          null,
+          this.state.blue
+        )
       );
     }
   }]);
 
   return App;
 }(React.Component);
+// Refs only work with Stateful components!
 
-// Ownee component - it is rendered within an owner component
+var Slider = function (_React$Component2) {
+  _inherits(Slider, _React$Component2);
 
-var Widget = function Widget(props) {
-  return React.createElement(
-    'div',
-    null,
-    React.createElement('input', {
-      onChange: props.update, type: 'text' }),
-    React.createElement(
-      'span',
-      null,
-      props.txt
-    )
-  );
-};
+  function Slider() {
+    _classCallCheck(this, Slider);
+
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(Slider).apply(this, arguments));
+  }
+
+  _createClass(Slider, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        null,
+        React.createElement('input', { ref: 'input', onChange: this.props.update,
+          type: 'range',
+          min: '0',
+          max: '255' })
+      );
+    }
+  }]);
+
+  return Slider;
+}(React.Component);
+
 ReactDom.render(React.createElement(App, null), document.querySelector('.react'));
 
 },{"react":160,"react-dom":4}],3:[function(require,module,exports){
