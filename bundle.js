@@ -3,9 +3,9 @@
 
 var React = require('react');
 var ReactDom = require('react-dom');
-var App = require('./modules/using-refs-to-access-components.js');
+var App = require('./modules/accessing-child-properties.js');
 
-},{"./modules/using-refs-to-access-components.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
+},{"./modules/accessing-child-properties.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -25,52 +25,20 @@ var App = function (_React$Component) {
   function App() {
     _classCallCheck(this, App);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
-
-    _this.state = {
-      red: 0,
-      green: 0,
-      blue: 0
-    };
-    _this.update = _this.update.bind(_this);
-    return _this;
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).apply(this, arguments));
   }
 
   _createClass(App, [{
-    key: 'update',
-    value: function update(e) {
-      this.setState({
-        // red:ReactDom.findDOMNode(this.refs.red).value,
-        // the above line will work if the child component returned a single node
-        red: ReactDom.findDOMNode(this.refs.red.refs.input).value,
-        green: ReactDom.findDOMNode(this.refs.green.refs.input).value,
-        blue: ReactDom.findDOMNode(this.refs.blue.refs.input).value
-      });
-      console.log(ReactDom.findDOMNode(this.refs.blue).value);
-    }
-  }, {
     key: 'render',
     value: function render() {
-      return React.createElement(
-        'div',
-        null,
-        React.createElement(Slider, { ref: 'red', update: this.update }),
+      return(
+        // <Heart/> and the text are children of Button
         React.createElement(
-          'p',
+          Button,
           null,
-          this.state.red
-        ),
-        React.createElement(Slider, { ref: 'green', update: this.update }),
-        React.createElement(
-          'p',
-          null,
-          this.state.green
-        ),
-        React.createElement(Slider, { ref: 'blue', update: this.update }),
-        React.createElement(
-          'p',
-          null,
-          this.state.blue
+          ' ',
+          React.createElement(Heart, null),
+          'blah di blah'
         )
       );
     }
@@ -78,33 +46,41 @@ var App = function (_React$Component) {
 
   return App;
 }(React.Component);
-// Refs only work with Stateful components!
 
-var Slider = function (_React$Component2) {
-  _inherits(Slider, _React$Component2);
+var Button = function (_React$Component2) {
+  _inherits(Button, _React$Component2);
 
-  function Slider() {
-    _classCallCheck(this, Slider);
+  function Button() {
+    _classCallCheck(this, Button);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(Slider).apply(this, arguments));
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(Button).apply(this, arguments));
   }
 
-  _createClass(Slider, [{
+  _createClass(Button, [{
     key: 'render',
     value: function render() {
-      return React.createElement(
-        'div',
-        null,
-        React.createElement('input', { ref: 'input', onChange: this.props.update,
-          type: 'range',
-          min: '0',
-          max: '255' })
+      return(
+        // props.children displays anything - text, elems, components
+        // which are nested within this component
+        React.createElement(
+          'button',
+          null,
+          this.props.children
+        )
       );
     }
   }]);
 
-  return Slider;
+  return Button;
 }(React.Component);
+
+var Heart = function Heart() {
+  return React.createElement(
+    'span',
+    { className: 'some-heart' },
+    '♥'
+  );
+};
 
 ReactDom.render(React.createElement(App, null), document.querySelector('.react'));
 
