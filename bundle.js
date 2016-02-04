@@ -3,9 +3,9 @@
 
 var React = require('react');
 var ReactDom = require('react-dom');
-var App = require('./modules/accessing-child-properties.js');
+var App = require('./modules/component-lifecycle-mounting-basics.js');
 
-},{"./modules/accessing-child-properties.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
+},{"./modules/component-lifecycle-mounting-basics.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -25,21 +25,49 @@ var App = function (_React$Component) {
   function App() {
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
+
+    _this.state = { val: 0 };
+    _this.update = _this.update.bind(_this);
+    return _this;
   }
 
   _createClass(App, [{
+    key: 'update',
+    value: function update() {
+      this.setState({ val: this.state.val + 1 });
+    }
+    // component is fully prepped and guaranteed to make it into the DOM
+    // only called once
+
+  }, {
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      console.log('mounting');
+    }
+    // called after our component is placed into the DOM
+    // only called once
+
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      console.log('mounted');
+    }
+    // called when we are about to remove our component from the DOM
+
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      console.log('bye');
+    }
+  }, {
     key: 'render',
     value: function render() {
-      return(
-        // <Heart/> and the text are children of Button
-        React.createElement(
-          Button,
-          null,
-          ' ',
-          React.createElement(Heart, null),
-          'blah di blah'
-        )
+      console.log('rendering');
+      return React.createElement(
+        'button',
+        { onClick: this.update },
+        this.state.val
       );
     }
   }]);
@@ -47,42 +75,52 @@ var App = function (_React$Component) {
   return App;
 }(React.Component);
 
-var Button = function (_React$Component2) {
-  _inherits(Button, _React$Component2);
+// a wrapper component which adds and removes the component from the DOM
 
-  function Button() {
-    _classCallCheck(this, Button);
+var Wrapper = function (_React$Component2) {
+  _inherits(Wrapper, _React$Component2);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(Button).apply(this, arguments));
+  function Wrapper() {
+    _classCallCheck(this, Wrapper);
+
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(Wrapper).call(this));
   }
 
-  _createClass(Button, [{
+  _createClass(Wrapper, [{
+    key: 'mount',
+    value: function mount() {
+      ReactDom.render(React.createElement(App, null), document.querySelector('.app'));
+    }
+  }, {
+    key: 'unmount',
+    value: function unmount() {
+      ReactDom.unmountComponentAtNode(document.querySelector('.app'));
+    }
+  }, {
     key: 'render',
     value: function render() {
-      return(
-        // props.children displays anything - text, elems, components
-        // which are nested within this component
+      return React.createElement(
+        'div',
+        null,
         React.createElement(
           'button',
-          null,
-          this.props.children
-        )
+          { onClick: this.mount },
+          'mount'
+        ),
+        React.createElement(
+          'button',
+          { onClick: this.unmount },
+          'unmount'
+        ),
+        React.createElement('div', { className: 'app' })
       );
     }
   }]);
 
-  return Button;
+  return Wrapper;
 }(React.Component);
 
-var Heart = function Heart() {
-  return React.createElement(
-    'span',
-    { className: 'some-heart' },
-    '♥'
-  );
-};
-
-ReactDom.render(React.createElement(App, null), document.querySelector('.react'));
+ReactDom.render(React.createElement(Wrapper, null), document.querySelector('.react'));
 
 },{"react":160,"react-dom":4}],3:[function(require,module,exports){
 // shim for using process in browser
