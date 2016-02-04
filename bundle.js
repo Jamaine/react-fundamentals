@@ -3,9 +3,9 @@
 
 var React = require('react');
 var ReactDom = require('react-dom');
-var App = require('./modules/component-lifecycle-mounting-basics.js');
+var App = require('./modules/component-lifecycle-mounting-usage.js');
 
-},{"./modules/component-lifecycle-mounting-basics.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
+},{"./modules/component-lifecycle-mounting-usage.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -17,7 +17,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
-var ReactDom = require('react-dom');
+var ReactDOM = require('react-dom');
 
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
@@ -33,49 +33,47 @@ var App = function (_React$Component) {
   }
 
   _createClass(App, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.setState({
+        // if we uncomment val, this.state.val will be 2 when the render method is called
+        // val:2,
+        multiple: 2
+      });
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      // Here we have access to the DOM, this will not work using componentWillMount
+      console.log(ReactDOM.findDOMNode(this));
+      // set an interval which calls update every 500ms and assign to a property
+      this.inc = setInterval(this.update, 500);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      // when the component unmounts, we clear the interval and stop the function setting state
+      // on unmounted component
+      clearInterval(this.inc);
+    }
+  }, {
     key: 'update',
     value: function update() {
       this.setState({ val: this.state.val + 1 });
     }
-    // component is fully prepped and guaranteed to make it into the DOM
-    // only called once
-
-  }, {
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      console.log('mounting');
-    }
-    // called after our component is placed into the DOM
-    // only called once
-
-  }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      console.log('mounted');
-    }
-    // called when we are about to remove our component from the DOM
-
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      console.log('bye');
-    }
   }, {
     key: 'render',
     value: function render() {
-      console.log('rendering');
       return React.createElement(
         'button',
         { onClick: this.update },
-        this.state.val
+        this.state.val * this.state.multiple
       );
     }
   }]);
 
   return App;
 }(React.Component);
-
-// a wrapper component which adds and removes the component from the DOM
 
 var Wrapper = function (_React$Component2) {
   _inherits(Wrapper, _React$Component2);
@@ -89,12 +87,12 @@ var Wrapper = function (_React$Component2) {
   _createClass(Wrapper, [{
     key: 'mount',
     value: function mount() {
-      ReactDom.render(React.createElement(App, null), document.querySelector('.app'));
+      ReactDOM.render(React.createElement(App, null), document.querySelector('.app'));
     }
   }, {
     key: 'unmount',
     value: function unmount() {
-      ReactDom.unmountComponentAtNode(document.querySelector('.app'));
+      ReactDOM.unmountComponentAtNode(document.querySelector('.app'));
     }
   }, {
     key: 'render',
@@ -120,7 +118,7 @@ var Wrapper = function (_React$Component2) {
   return Wrapper;
 }(React.Component);
 
-ReactDom.render(React.createElement(Wrapper, null), document.querySelector('.react'));
+ReactDOM.render(React.createElement(Wrapper, null), document.querySelector('.react'));
 
 },{"react":160,"react-dom":4}],3:[function(require,module,exports){
 // shim for using process in browser
