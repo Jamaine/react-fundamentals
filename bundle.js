@@ -3,9 +3,9 @@
 
 var React = require('react');
 var ReactDom = require('react-dom');
-var App = require('./modules/component-lifecycle-mounting-usage.js');
+var App = require('./modules/component-lifecycle-updating.js');
 
-},{"./modules/component-lifecycle-mounting-usage.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
+},{"./modules/component-lifecycle-updating.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -27,98 +27,74 @@ var App = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
 
-    _this.state = { val: 0 };
     _this.update = _this.update.bind(_this);
+    _this.state = { increasing: false };
     return _this;
   }
 
   _createClass(App, [{
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      this.setState({
-        // if we uncomment val, this.state.val will be 2 when the render method is called
-        // val:2,
-        multiple: 2
-      });
-    }
-  }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      // Here we have access to the DOM, this will not work using componentWillMount
-      console.log(ReactDOM.findDOMNode(this));
-      // set an interval which calls update every 500ms and assign to a property
-      this.inc = setInterval(this.update, 500);
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      // when the component unmounts, we clear the interval and stop the function setting state
-      // on unmounted component
-      clearInterval(this.inc);
-    }
-  }, {
     key: 'update',
     value: function update() {
-      this.setState({ val: this.state.val + 1 });
+      // rerender the App, incrementing the props
+      ReactDOM.render(React.createElement(App, { val: this.props.val + 1 }), document.querySelector('.react'));
+    }
+    // invoked before render, when a component is receiving new props
+    // takes in the next properties which will be passed into the component
+    // Use this as an opportunity to react to a prop transition before render()
+    // is called by updating the state using this.setState(). The old props can be accessed via this.props.
+    // Calling this.setState() within this function will not trigger an additional render.
+    // https://facebook.github.io/react/docs/component-specs.html
+
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      console.log('next props', nextProps, this.props);
+      // if nextProps.val > this.props.val increasing = true
+      this.setState({ increasing: nextProps.val > this.props.val });
+    }
+    // invoked before rendering when new props or state are being received
+    // not called on initial render or under forceUpdate
+    // Used for optimisation - when we do NOT want the component to update
+    // it should return false
+    // https://facebook.github.io/react/docs/component-specs.html
+
+  }, {
+    key: 'shouldComponentUpdate',
+    value: function shouldComponentUpdate(nextProps, nextState) {
+      // if next props is not divisible by 5, we do not update
+      return nextProps.val % 5 === 0;
     }
   }, {
     key: 'render',
     value: function render() {
+      console.log(this.state.increasing);
       return React.createElement(
         'button',
         { onClick: this.update },
-        this.state.val * this.state.multiple
+        this.props.val
       );
+    }
+    // Invoked immediately after the components updates have been flushed to the DOM
+    // not called on initial render
+    // takes prevProps and prevState, even if the component didnt update, as state and prevProps
+    // can update regardless of whether we have told the component to
+    // https://facebook.github.io/react/docs/component-specs.html
+
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      console.log('prevProps', prevProps);
     }
   }]);
 
   return App;
 }(React.Component);
 
-var Wrapper = function (_React$Component2) {
-  _inherits(Wrapper, _React$Component2);
+App.defaultProps = {
+  val: 0
+};
 
-  function Wrapper() {
-    _classCallCheck(this, Wrapper);
-
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(Wrapper).call(this));
-  }
-
-  _createClass(Wrapper, [{
-    key: 'mount',
-    value: function mount() {
-      ReactDOM.render(React.createElement(App, null), document.querySelector('.app'));
-    }
-  }, {
-    key: 'unmount',
-    value: function unmount() {
-      ReactDOM.unmountComponentAtNode(document.querySelector('.app'));
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return React.createElement(
-        'div',
-        null,
-        React.createElement(
-          'button',
-          { onClick: this.mount },
-          'mount'
-        ),
-        React.createElement(
-          'button',
-          { onClick: this.unmount },
-          'unmount'
-        ),
-        React.createElement('div', { className: 'app' })
-      );
-    }
-  }]);
-
-  return Wrapper;
-}(React.Component);
-
-ReactDOM.render(React.createElement(Wrapper, null), document.querySelector('.react'));
+ReactDOM.render(React.createElement(App, null), document.querySelector('.react'));
 
 },{"react":160,"react-dom":4}],3:[function(require,module,exports){
 // shim for using process in browser
