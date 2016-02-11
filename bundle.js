@@ -3,10 +3,12 @@
 
 var React = require('react');
 var ReactDom = require('react-dom');
-var App = require('./modules/component-lifecycle-updating.js');
+var App = require('./modules/higher-order-components.js');
 
-},{"./modules/component-lifecycle-updating.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
+},{"./modules/higher-order-components.js":2,"react":160,"react-dom":4}],2:[function(require,module,exports){
 'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -19,80 +21,109 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var App = function (_React$Component) {
-  _inherits(App, _React$Component);
+// Mixin takes parameter of InnerComponent
+// returns a new component
+// This is not a mixin as per the React spec, as you cannot use mixins with ES6 classes
+var Mixin = function Mixin(InnerComponent) {
+  return function (_React$Component) {
+    _inherits(_class, _React$Component);
+
+    function _class() {
+      _classCallCheck(this, _class);
+
+      var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this));
+
+      _this.state = {
+        val: 0
+      };
+      _this.update = _this.update.bind(_this);
+      return _this;
+    }
+
+    _createClass(_class, [{
+      key: 'update',
+      value: function update() {
+        this.setState({ val: this.state.val + 1 });
+      }
+    }, {
+      key: 'componentWillMount',
+      value: function componentWillMount() {
+        console.log('will mount');
+      }
+    }, {
+      key: 'render',
+      value: function render() {
+        return(
+          // the state and props seem to get merged into props
+          // when generating a stateless component - possible issue?
+          React.createElement(InnerComponent, _extends({
+            update: this.update
+          }, this.state, this.props))
+          // {...state} just allows us to add any number of items - see spread operator
+
+        );
+      }
+    }, {
+      key: 'componentDidMount',
+      value: function componentDidMount() {
+        console.log('component Mounted');
+      }
+    }]);
+
+    return _class;
+  }(React.Component);
+};
+
+// stateless components
+var Button = function Button(props) {
+  return React.createElement(
+    'button',
+    {
+      onClick: props.update },
+    props.txt,
+    ' - ',
+    props.val
+  );
+};
+
+var Label = function Label(props) {
+  return React.createElement(
+    'label',
+    {
+      onMouseMove: props.update },
+    props.txt,
+    ' - ',
+    props.val
+  );
+};
+
+// When passed to Mixin() they return a component which inherets methods, props, state etc..
+var ButtonMixed = Mixin(Button);
+var LabelMixed = Mixin(Label);
+
+var App = function (_React$Component2) {
+  _inherits(App, _React$Component2);
 
   function App() {
     _classCallCheck(this, App);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
-
-    _this.update = _this.update.bind(_this);
-    _this.state = { increasing: false };
-    return _this;
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).apply(this, arguments));
   }
 
   _createClass(App, [{
-    key: 'update',
-    value: function update() {
-      // rerender the App, incrementing the props
-      ReactDOM.render(React.createElement(App, { val: this.props.val + 1 }), document.querySelector('.react'));
-    }
-    // invoked before render, when a component is receiving new props
-    // takes in the next properties which will be passed into the component
-    // Use this as an opportunity to react to a prop transition before render()
-    // is called by updating the state using this.setState(). The old props can be accessed via this.props.
-    // Calling this.setState() within this function will not trigger an additional render.
-    // https://facebook.github.io/react/docs/component-specs.html
-
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(nextProps) {
-      console.log('next props', nextProps, this.props);
-      // if nextProps.val > this.props.val increasing = true
-      this.setState({ increasing: nextProps.val > this.props.val });
-    }
-    // invoked before rendering when new props or state are being received
-    // not called on initial render or under forceUpdate
-    // Used for optimisation - when we do NOT want the component to update
-    // it should return false
-    // https://facebook.github.io/react/docs/component-specs.html
-
-  }, {
-    key: 'shouldComponentUpdate',
-    value: function shouldComponentUpdate(nextProps, nextState) {
-      // if next props is not divisible by 5, we do not update
-      return nextProps.val % 5 === 0;
-    }
-  }, {
     key: 'render',
     value: function render() {
-      console.log(this.state.increasing);
       return React.createElement(
-        'button',
-        { onClick: this.update },
-        this.props.val
+        'div',
+        null,
+        React.createElement(ButtonMixed, { txt: 'Button', val: 'skinout' }),
+        React.createElement(LabelMixed, { txt: 'Label' })
       );
-    }
-    // Invoked immediately after the components updates have been flushed to the DOM
-    // not called on initial render
-    // takes prevProps and prevState, even if the component didnt update, as state and prevProps
-    // can update regardless of whether we have told the component to
-    // https://facebook.github.io/react/docs/component-specs.html
-
-  }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps, prevState) {
-      console.log('prevProps', prevProps);
     }
   }]);
 
   return App;
 }(React.Component);
-
-App.defaultProps = {
-  val: 0
-};
 
 ReactDOM.render(React.createElement(App, null), document.querySelector('.react'));
 
